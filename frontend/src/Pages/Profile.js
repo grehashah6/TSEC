@@ -59,7 +59,7 @@ function Profile(props) {
 	useEffect(() => {
 		var myHeaders = new Headers();
 		myHeaders.append("x-rapidapi-host", "linkedin-profiles-and-company-data.p.rapidapi.com/");
-		myHeaders.append("x-rapidapi-key", "739808cfc6mshcfc8d16566f9a9ep148889jsn7ef08c2b588d");
+		myHeaders.append("x-rapidapi-key", "4e99400f66msh0841618e93cd6d9p1afaa9jsn44feffc98e63");
 		myHeaders.append("Content-Type", "application/json");
 		const data = JSON.parse(localStorage.getItem('User'))
 		console.log(data);

@@ -22,6 +22,10 @@ function SignUp() {
         linkedin: "",
     });
 
+    useEffect(() => {
+
+    }, [])
+
     const [open, setOpen] = React.useState(false);
     const [items, setItems] = useState([]);
     const [companyArray, setCompanyArray] = useState([]);
@@ -38,13 +42,44 @@ function SignUp() {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
+        var myHeaders = new Headers();
+        myHeaders.append("x-rapidapi-host", "linkedin-profiles-and-company-data.p.rapidapi.com");
+        myHeaders.append("x-rapidapi-key", "4e99400f66msh0841618e93cd6d9p1afaa9jsn44feffc98e63");
+        myHeaders.append("Content-Type", "application/json");
+        const data = JSON.parse(localStorage.getItem('User'))
+        console.log(data);
+        var raw = JSON.stringify({
+            "profile_id": data.linkedIn,
+            "profile_type": "personal",
+            "contact_info": false,
+            "recommendations": false,
+            "related_profiles": false
+        });
+
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+
+        fetch("https://linkedin-profiles-and-company-data.p.rapidapi.com/profile-details", requestOptions)
+            .then(response => response.json())
+            .then(result => {
+                console.log(result.awards);
+                setCompanyArray(result.position_groups)
+                setItems(result.skills)
+                setAchivementArray(result.awards)
+            })
+            .catch(error => console.log('error', error));
+
         var raw = JSON.stringify({
             name: list.name,
             password: list.password,
             email: list.email,
             contact: list.contact,
-            github: gitusername,
-            linkedIn: linkedin_username,
+            githubId: gitusername,
+            linkedinId: linkedin_username,
             companyName: companyArray,
             awards: achivementArray,
             skills: items
