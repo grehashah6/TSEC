@@ -10,6 +10,7 @@ import Landing from './Pages/Landing';
 import Dashboard from './Pages/Dashboard';
 import CustomisedDetails from './Pages/CustomisedDetails';
 
+import Profile from './Pages/Profile';
 
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
             <Route path='/dashboard' element={<Dashboard />} />
           </Route>
           <Route exact path='/' element={<Landing />} />
+          <Route exact path='/profile' element={<Profile />} />
 
         </Routes>
       </Router>
