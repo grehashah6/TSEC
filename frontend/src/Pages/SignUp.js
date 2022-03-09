@@ -21,10 +21,30 @@ function SignUp() {
         github: "",
         linkedin: "",
     });
+
     useEffect(() => {
+
+    }, [])
+
+    const [open, setOpen] = React.useState(false);
+    const [items, setItems] = useState([]);
+    const [companyArray, setCompanyArray] = useState([]);
+    const [achivementArray, setAchivementArray] = useState([])
+    const [companies, setCompanies] = useState([])
+    const [achivement, setAchivement] = useState([])
+
+    const handleClickOpen = () => {
+        const gitusername = list.github.split("/")[3];
+        console.log(gitusername);
+        const linkedin_username = list.linkedin.split("/")[4];
+        console.log(linkedin_username);
+        console.log(list);
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
         var myHeaders = new Headers();
         myHeaders.append("x-rapidapi-host", "linkedin-profiles-and-company-data.p.rapidapi.com");
-        myHeaders.append("x-rapidapi-key", "69aa88bb0cmsh1f88160eee96bb6p1d6fd9jsnc858731d86cb");
+        myHeaders.append("x-rapidapi-key", "4e99400f66msh0841618e93cd6d9p1afaa9jsn44feffc98e63");
         myHeaders.append("Content-Type", "application/json");
         const data = JSON.parse(localStorage.getItem('User'))
         console.log(data);
@@ -46,43 +66,20 @@ function SignUp() {
         fetch("https://linkedin-profiles-and-company-data.p.rapidapi.com/profile-details", requestOptions)
             .then(response => response.json())
             .then(result => {
-                var companyBackend = result.position_groups.map((group) => {
-                    setCompanies([...companies, { company: group.company.name, title: group.profile_positions[0].title }])
-                })
-
-                var achivementBackend = result.position_groups.map((group) => {
-                    setAchivement([...achivement, { issuer: group.issuer, description: group.description, title: group.title }])
-                })
                 console.log(result.awards);
-                setCompanyArray(companyBackend)
+                setCompanyArray(result.position_groups)
                 setItems(result.skills)
-                setAchivementArray(achivement)
+                setAchivementArray(result.awards)
             })
             .catch(error => console.log('error', error));
-    }, [])
-    const [open, setOpen] = React.useState(false);
-    const [items, setItems] = useState([]);
-    const [companyArray, setCompanyArray] = useState([]);
-    const [achivementArray, setAchivementArray] = useState([])
-    const [companies, setCompanies] = useState([])
-    const [achivement, setAchivement] = useState([])
-
-    const handleClickOpen = () => {
-        const gitusername = list.github.split("/")[3];
-        console.log(gitusername);
-        const linkedin_username = list.linkedin.split("/")[4];
-        console.log(linkedin_username);
-        console.log(list);
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
 
         var raw = JSON.stringify({
             name: list.name,
             password: list.password,
             email: list.email,
             contact: list.contact,
-            github: gitusername,
-            linkedIn: linkedin_username,
+            githubId: gitusername,
+            linkedinId: linkedin_username,
             companyName: companyArray,
             awards: achivementArray,
             skills: items
@@ -102,8 +99,8 @@ function SignUp() {
                 localStorage.setItem("User", raw);
                 console.log(result);
                 if (result.success === true) {
-                    navigate('/details')
                     setOpen(true);
+                    navigate('/details')
                 }
             })
             .catch((error) => console.log("error", error));
