@@ -7,6 +7,7 @@ import Login from './Pages/Login';
 import SignUp from './Pages/SignUp';
 import Details from './Pages/Details';
 import Landing from './Pages/Landing';
+import Profile from './Pages/Profile';
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route exact path='/signup' element={<SignUp />} />
           <Route exact path='/details' element={<Details />} />
           <Route exact path='/' element={<Landing />} />
+          <Route exact path='/profile' element={<Profile />} />
 
         </Routes>
       </Router>
