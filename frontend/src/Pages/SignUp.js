@@ -47,7 +47,7 @@ function SignUp() {
             redirect: "follow",
         };
 
-        fetch("http://localhost:3001/api/user/register", requestOptions)
+        fetch("https://tsec-hacks-devhub.herokuapp.com/api/user/register", requestOptions)
             .then((response) => response.text())
             .then((result) => {
                 localStorage.setItem("User", raw);
