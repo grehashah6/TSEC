@@ -1,5 +1,5 @@
 import { Button, Grid } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import { useNavigate } from "react-router";
 import Popup from "reactjs-popup";
@@ -9,6 +9,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import "../CSS/Signup.css";
+import Navbar from "./Navbar";
 
 function SignUp() {
     const navigate = useNavigate();
@@ -20,7 +21,51 @@ function SignUp() {
         github: "",
         linkedin: "",
     });
+    useEffect(() => {
+        var myHeaders = new Headers();
+        myHeaders.append("x-rapidapi-host", "linkedin-profiles-and-company-data.p.rapidapi.com");
+        myHeaders.append("x-rapidapi-key", "69aa88bb0cmsh1f88160eee96bb6p1d6fd9jsnc858731d86cb");
+        myHeaders.append("Content-Type", "application/json");
+        const data = JSON.parse(localStorage.getItem('User'))
+        console.log(data);
+        var raw = JSON.stringify({
+            "profile_id": data.linkedIn,
+            "profile_type": "personal",
+            "contact_info": false,
+            "recommendations": false,
+            "related_profiles": false
+        });
+
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+
+        fetch("https://linkedin-profiles-and-company-data.p.rapidapi.com/profile-details", requestOptions)
+            .then(response => response.json())
+            .then(result => {
+                var companyBackend = result.position_groups.map((group) => {
+                    setCompanies([...companies, { company: group.company.name, title: group.profile_positions[0].title }])
+                })
+
+                var achivementBackend = result.position_groups.map((group) => {
+                    setAchivement([...achivement, { issuer: group.issuer, description: group.description, title: group.title }])
+                })
+                console.log(result.awards);
+                setCompanyArray(companyBackend)
+                setItems(result.skills)
+                setAchivementArray(achivement)
+            })
+            .catch(error => console.log('error', error));
+    }, [])
     const [open, setOpen] = React.useState(false);
+    const [items, setItems] = useState([]);
+    const [companyArray, setCompanyArray] = useState([]);
+    const [achivementArray, setAchivementArray] = useState([])
+    const [companies, setCompanies] = useState([])
+    const [achivement, setAchivement] = useState([])
 
     const handleClickOpen = () => {
         const gitusername = list.github.split("/")[3];
@@ -38,6 +83,9 @@ function SignUp() {
             contact: list.contact,
             github: gitusername,
             linkedIn: linkedin_username,
+            companyName: companyArray,
+            awards: achivementArray,
+            skills: items
         });
 
         var requestOptions = {
@@ -47,17 +95,31 @@ function SignUp() {
             redirect: "follow",
         };
 
-        fetch("http://localhost:3001/api/user/register", requestOptions)
-            .then((response) => response.text())
+        fetch("https://tsec-hacks-devhub.herokuapp.com/api/user/register", requestOptions)
+            .then((response) => response.json())
             .then((result) => {
+                localStorage.setItem('token', result)
                 localStorage.setItem("User", raw);
                 console.log(result);
+                if (result.success === true) {
+                    navigate('/details')
+                    setOpen(true);
+                }
             })
             .catch((error) => console.log("error", error));
-        setOpen(true);
+    };
+
+    const handleDisagreeClose = () => {
+        navigate('/customisedDetails')
+        setOpen(false);
     };
 
     const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleAgreeClose = () => {
+        navigate('/details')
         setOpen(false);
     };
 
@@ -69,6 +131,8 @@ function SignUp() {
 
     return (
         <>
+            <Navbar color={'white'} />
+
             <Grid
                 container
                 style={{
@@ -321,7 +385,7 @@ function SignUp() {
                                             }}
                                         >
                                             <Button
-                                                onClick={handleClose}
+                                                onClick={handleDisagreeClose}
                                                 sx={{
                                                     color: "black",
                                                 }}
@@ -329,7 +393,7 @@ function SignUp() {
                                                 Disagree
                                             </Button>
                                             <Button
-                                                onClick={handleClose}
+                                                onClick={handleAgreeClose}
                                                 sx={{
                                                     color: "black",
                                                 }}

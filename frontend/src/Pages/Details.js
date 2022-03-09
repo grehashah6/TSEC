@@ -12,8 +12,43 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Avatar from '@mui/material/Avatar';
+import { useNavigate } from "react-router";
 
 function Details() {
+    const navigate = useNavigate();
+    useEffect(() => {
+        var myHeaders = new Headers();
+        myHeaders.append("x-rapidapi-host", "linkedin-profiles-and-company-data.p.rapidapi.com");
+        myHeaders.append("x-rapidapi-key", "69aa88bb0cmsh1f88160eee96bb6p1d6fd9jsnc858731d86cb");
+        myHeaders.append("Content-Type", "application/json");
+        const data = JSON.parse(localStorage.getItem('User'))
+        console.log(data);
+        var raw = JSON.stringify({
+            "profile_id": data.linkedIn,
+            "profile_type": "personal",
+            "contact_info": false,
+            "recommendations": false,
+            "related_profiles": false
+        });
+
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+
+        fetch("https://linkedin-profiles-and-company-data.p.rapidapi.com/profile-details", requestOptions)
+            .then(response => response.json())
+            .then(result => {
+                console.log(result.awards);
+                setCompanyArray(result.position_groups)
+                setItems(result.skills)
+                setAchivementArray(result.awards)
+            })
+            .catch(error => console.log('error', error));
+    }, [])
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
         [`&.${tableCellClasses.head}`]: {
@@ -38,7 +73,7 @@ function Details() {
         },
     }));
 
-    const [list, setList] = useState({ skill: '' });
+    const [list, setList] = useState();
     const [companies, setCompanies] = useState({ company_name: '', title: '' });
     const [achivements, setAchivements] = useState({ issuer: '', title: '', description: '' })
     const [items, setItems] = useState([]);
@@ -49,11 +84,6 @@ function Details() {
 
 
 
-    const handleChange = (e) => {
-        const name = e.target.name
-        const value = e.target.value
-        setList({ ...list, [name]: value })
-    }
 
     const handleCompanyChange = (e) => {
         const name = e.target.name
@@ -69,10 +99,10 @@ function Details() {
 
     const addToList = (e) => {
         e.preventDefault();
-        if (list.skill) {
-            const newRequirement = { ...list, id: new Date().getTime().toString() };
+        if (list) {
+            const newRequirement = { ...list };
             setItems([...items, newRequirement]);
-            setList({ skill: '' })
+            setList()
         }
     }
 
@@ -107,7 +137,7 @@ function Details() {
     };
 
     const handleDelete = (id) => {
-        const newList = items.filter((singleItems) => singleItems.id !== id);
+        const newList = items.filter((singleItems, index) => index !== id);
         setItems(newList);
     };
 
@@ -135,24 +165,15 @@ function Details() {
                 <Grid container>
                     <Grid item sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                         <h3>Tech skills</h3>
-                        <div>
-                            <TextField margin="normal" required id="skill" label="Skill Name" name="skill" value={list.skill} onChange={handleChange} />
-                            <Button style={{ border: '3px solid #8080FF', color: '#8080FF', marginLeft: '5px', marginTop: '8%', background: 'rgba(128, 128, 255, 0.2)', fontWeight: '600', fontSize: '1.1em', height: '54px', marginTop: '6%' }} onClick={addToList}>Add +</Button>
-                        </div>
                     </Grid>
                     <Grid item sx={{ width: '100%' }}>
                         <Card sx={{ width: '100%' }}>
                             <CardContent>
                                 {
-                                    items ? <Stack direction="row" spacing={1}>
-                                        {
-                                            items.map((item) => {
-                                                return <Chip label={item.skill} key={item.id} sx={{ backgroundColor: 'rgba(128, 128, 255, 0.2)', marginLeft: '5px' }} variant="outlined" onDelete={() => { handleDelete(item.id) }} />
-                                            })
-                                        }
-                                    </Stack> : <h1>No skills Mentioned</h1>
+                                    items ? items.map((item, index) => {
+                                        return <Chip label={item} key={item.index} sx={{ backgroundColor: 'rgba(128, 128, 255, 0.2)', marginLeft: '5px', marginBottom: '5px' }} variant="outlined" avatar={<Avatar sx={{ backgroundColor: '#212124', color: 'black' }}>.</Avatar>} />
+                                    }) : ''
                                 }
-
                             </CardContent>
                         </Card>
 
@@ -161,90 +182,53 @@ function Details() {
                 <Grid container sx={{ marginTop: '5%' }}>
                     <Grid item sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                         <h3>Companies</h3>
-                        <div>
-                            <TextField margin="normal" required id="company_name" label="Company Name" name="company_name" value={companies.company_name} onChange={handleCompanyChange} />
-                            <TextField margin="normal" required id="title" label="Title" name="title" style={{ marginLeft: '5px' }} value={companies.title} onChange={handleCompanyChange} />
-                            <Button style={{ border: '3px solid #8080FF', color: '#8080FF', marginLeft: '5px', marginTop: '3%', background: 'rgba(128, 128, 255, 0.2)', fontWeight: '600', fontSize: '1.1em', height: '54px', marginTop: '6%' }} onClick={addToCompanyList}>{editSingleCompany}</Button>
-                        </div>
                     </Grid>
-                    <TableContainer component={Paper}>
-                        <Table sx={{ minWidth: 700 }} aria-label="customized table">
-                            <TableHead>
-                                <TableRow>
-                                    <StyledTableCell style={{ fontWeight: 'bolder', color: '#212124' }}>Company Names</StyledTableCell>
-                                    <StyledTableCell align="right" style={{ fontWeight: 'bolder', color: '#212124' }}>Title</StyledTableCell>
-                                    <StyledTableCell align="right" style={{ fontWeight: 'bolder', color: '#212124' }}>Edit Options</StyledTableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {companyArray.map((singleCompany) => (
-                                    <StyledTableRow key={singleCompany.id}>
-                                        <StyledTableCell component="th" scope="row">
-                                            {singleCompany.company_name}
-                                        </StyledTableCell>
-                                        <StyledTableCell align="right">{singleCompany.title}</StyledTableCell>
-                                        <StyledTableCell align="right">
-                                            <Grid container style={{ display: 'flex', columnGap: '2%', justifyContent: 'flex-end' }}>
-                                                <Grid item>
-                                                    <DeleteIcon style={{ cursor: 'pointer', color: 'green' }} onClick={() => handleCompanyDelete(singleCompany.id)} />
-                                                </Grid>
-                                                <Grid item>
-                                                    <EditIcon style={{ cursor: 'pointer', color: 'red' }} onClick={() => handleCompanyEdit(singleCompany.id)} />
-                                                </Grid>
+                    <Grid container spacing={5}>
+                        {companyArray ? companyArray.map((singleCompany, index) => (
+                            <Grid item md={3}>
+                                <Card>
+                                    <CardContent>
+                                        <Grid container sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <Grid item>
+                                                <img src={singleCompany.company.logo} width={50} height={50} />
                                             </Grid>
-                                        </StyledTableCell>
-                                    </StyledTableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                            <Grid item >
+                                                <h6 style={{ textAlign: 'right', margin: '0', padding: '0' }}>{singleCompany.company.name}</h6>
+                                                <p style={{ textAlign: 'right', margin: '0', padding: '0', fontSize: '10px' }}>{singleCompany.profile_positions[0].title}</p>
+                                            </Grid>
+                                        </Grid>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        )) : ''}
+                    </Grid>
                 </Grid>
                 <Grid container sx={{ marginTop: '5%' }}>
                     <Grid item sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                        <h3>Achivements</h3>
-                        <div>
-                            <TextField margin="normal" required id="issuer" label="Issuer" name="issuer" value={achivements.issuer} onChange={handleAchivementChange} />
-                            <TextField margin="normal" required id="title" label="Title" name="title" style={{ marginLeft: '5px' }} value={achivements.title} onChange={handleAchivementChange} />
-                            <TextField margin="normal" required id="description" label="description" name="description" style={{ marginLeft: '5px' }} value={achivements.description} onChange={handleAchivementChange} />
-                            <Button style={{ border: '3px solid #8080FF', color: '#8080FF', marginLeft: '5px', marginTop: '3%', background: 'rgba(128, 128, 255, 0.2)', fontWeight: '600', fontSize: '1.1em', height: '54px', marginTop: '2%' }} onClick={addToAchivementList}>{editSingleAchivement}</Button>
-                        </div>
+                        <h3>Achievements</h3>
                     </Grid>
-                    <TableContainer component={Paper}>
-                        <Table sx={{ minWidth: 700 }} aria-label="customized table">
-                            <TableHead>
-                                <TableRow>
-                                    <StyledTableCell style={{ fontWeight: 'bolder', color: '#212124' }}>Issuer</StyledTableCell>
-                                    <StyledTableCell align="right" style={{ fontWeight: 'bolder', color: '#212124' }}>Title</StyledTableCell>
-                                    <StyledTableCell align="right" style={{ fontWeight: 'bolder', color: '#212124' }}>Description</StyledTableCell>
-                                    <StyledTableCell align="right" style={{ fontWeight: 'bolder', color: '#212124' }}>Edit Options</StyledTableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {achivementArray.map((singleAchivement) => (
-                                    <StyledTableRow key={singleAchivement.id}>
-                                        <StyledTableCell component="th" scope="row">
-                                            {singleAchivement.issuer}
-                                        </StyledTableCell>
-                                        <StyledTableCell align="right">{singleAchivement.title}</StyledTableCell>
-                                        <StyledTableCell align="right">{singleAchivement.description}</StyledTableCell>
-
-                                        <StyledTableCell align="right">
-                                            <Grid container style={{ display: 'flex', columnGap: '2%', justifyContent: 'flex-end' }}>
-                                                <Grid item>
-                                                    <DeleteIcon style={{ cursor: 'pointer', color: 'green' }} onClick={() => handleAchivementDelete(singleAchivement.id)} />
-                                                </Grid>
-                                                <Grid item>
-                                                    <EditIcon style={{ cursor: 'pointer', color: 'red' }} onClick={() => handleAchivementEdit(singleAchivement.id)} />
-                                                </Grid>
-                                            </Grid>
-                                        </StyledTableCell>
-                                    </StyledTableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                    <Grid container spacing={5}>
+                        {
+                            achivementArray ? '' : achivementArray.map((achivement, index) => {
+                                return <Grid item key={index}>
+                                    <Card>
+                                        <CardContent>
+                                            <h3>{achivement.issuer}</h3>
+                                            <p style={{ margin: '0', padding: '0', fontSize: '10px' }}>{achivement.title}</p>
+                                            <hr />
+                                            <p style={{ margin: '0', padding: '0', textAlign: 'justify' }}>{achivement.title}</p>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            })
+                        }
+                    </Grid>
                 </Grid>
             </Grid>
+            <Grid sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <Button style={{ width: '50%', marginBottom: '5%', height: '45px', border: '2px solid #8080FF', color: '#8080FF', marginTop: '2%', background: 'rgba(128, 128, 255, 0.2)', fontWeight: '600', fontSize: '1.1em' }} onClick={() => navigate('/dashboard')}>Confirm & Proceed</Button>
+            </Grid>
+
         </>
     )
 }
