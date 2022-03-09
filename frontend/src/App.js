@@ -7,6 +7,9 @@ import Login from './Pages/Login';
 import SignUp from './Pages/SignUp';
 import Details from './Pages/Details';
 import Landing from './Pages/Landing';
+import Dashboard from './Pages/Dashboard';
+import CustomisedDetails from './Pages/CustomisedDetails';
+
 import Profile from './Pages/Profile';
 import ProjectForm from './Pages/ProjectForm';
 
@@ -17,13 +20,6 @@ function App() {
     return token ? <Outlet /> : <Navigate to="/login" />
   }
 
-  // const theme = createTheme({
-  //   palette: {
-  //     secondary: {
-  //       main: '#E33E7F'
-  //     }
-  //   }
-  // });
 
   return (
     <>
@@ -31,7 +27,15 @@ function App() {
         <Routes>
           <Route exact path='/login' element={<Login />} />
           <Route exact path='/signup' element={<SignUp />} />
-          <Route exact path='/details' element={<Details />} />
+          <Route path='/details' element={<PrivateRoute />} >
+            <Route path='/details' element={<Details />} />
+          </Route>
+          <Route path='/customisedDetails' element={<PrivateRoute />} >
+            <Route path='/customisedDetails' element={<CustomisedDetails />} />
+          </Route>
+          <Route path='/dashboard' element={<PrivateRoute />} >
+            <Route path='/dashboard' element={<Dashboard />} />
+          </Route>
           <Route exact path='/' element={<Landing />} />
           <Route exact path='/profile' element={<Profile />} />
           <Route exact path='/projectform' element={<ProjectForm />} />

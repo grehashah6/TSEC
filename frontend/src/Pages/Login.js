@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import TextField from "@mui/material/TextField";
 import { useNavigate } from 'react-router';
 import { Link } from "react-router-dom";
+import Navbar from './Navbar';
 
 const pages = ['News', 'Nearby safe spots'];
 
@@ -19,6 +20,7 @@ const Login = () => {
     }
 
     const handleSubmit = (e) => {
+        e.preventDefault()
         if (list.email && list.password) {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
@@ -35,17 +37,18 @@ const Login = () => {
                 redirect: 'follow'
             };
 
-            fetch("http://localhost:3001/api/user/login", requestOptions)
+            fetch("https://tsec-hacks-devhub.herokuapp.com/api/user/login", requestOptions)
                 .then(response => response.text())
                 .then(result => {
-                    console.log(result)
-                    localStorage.setItem('Token', result);
+                    localStorage.setItem('token', result)
+                    navigate('/dashboard')
                 })
                 .catch(error => console.log('error', error));
         }
     }
     return (
         <>
+            <Navbar color={'white'} />
             <Grid container style={{ padding: '15px', width: '100vw', height: '100vh', position: 'relative' }}>
                 <Grid item style={{ background: 'linear-gradient(140.85deg, #6464CA -16.02%, rgba(128, 128, 255, 0.54) 112.29%)', width: '100%', height: '100%', borderRadius: '7px' }}>
                     <Grid container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', height: '100%' }}>

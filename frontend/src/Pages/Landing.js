@@ -37,6 +37,7 @@ export default function LoginSide() {
                 sx={{
                     backgroundColor:
                         "linear-gradient(140.85deg, rgba(100, 100, 202, 0.41) -16.02%, rgba(128, 128, 255, 0.13) 112.29%);",
+                    height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'
                 }}
             >
                 <div>
@@ -85,7 +86,6 @@ export default function LoginSide() {
                                                     display: "flex",
                                                     justifyContent: "center",
                                                     alignItems: "center",
-                                                    width: "100%",
                                                     flexDirection: "column",
                                                 }}
                                             >
@@ -132,6 +132,7 @@ export default function LoginSide() {
                                         justifyContent: "center",
                                         alignItems: "center",
                                         width: "100%",
+                                        height: '100%'
                                     }}
                                 >
                                     <Card sx={{ width: "60%" }}>
