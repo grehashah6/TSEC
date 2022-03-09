@@ -1,16 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
 import ButtonBase from "@material-ui/core/ButtonBase";
-import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import img from "../assets/img.jfif";
 import linkedin from "../assets/linkedin.jpg";
 import "@fontsource/roboto/500.css";
 import github from "../assets/github_img.png";
+import { useTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
 
 const styles = (theme) => ({
 	root: {
@@ -31,7 +39,7 @@ const styles = (theme) => ({
 	imeg: {
 		width: 50,
 		height: 40,
-        margin:2,
+		margin: 2,
 	},
 });
 const Item = styled(Paper)(({ theme }) => ({
@@ -43,34 +51,73 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 function Profile(props) {
+	const [items, setItems] = useState([]);
+	const [data, setData] = useState([]);
+	const [lclStorage, setlclStorage] = useState([])
+	const [companyArray, setCompanyArray] = useState([]);
+	const [achivementArray, setAchivementArray] = useState([])
+	useEffect(() => {
+		var myHeaders = new Headers();
+		myHeaders.append("x-rapidapi-host", "linkedin-profiles-and-company-data.p.rapidapi.com/");
+		myHeaders.append("x-rapidapi-key", "739808cfc6mshcfc8d16566f9a9ep148889jsn7ef08c2b588d");
+		myHeaders.append("Content-Type", "application/json");
+		const data = JSON.parse(localStorage.getItem('User'))
+		console.log(data);
+		var raw = JSON.stringify({
+			"profile_id": data.linkedIn,
+			"profile_type": "personal",
+			"contact_info": false,
+			"recommendations": false,
+			"related_profiles": false
+		});
+
+		var requestOptions = {
+			method: 'POST',
+			headers: myHeaders,
+			body: raw,
+			redirect: 'follow'
+		};
+		setlclStorage(JSON.parse(localStorage.getItem('User')))
+
+		fetch("https://linkedin-profiles-and-company-data.p.rapidapi.com/profile-details", requestOptions)
+			.then(response => response.json())
+			.then(result => {
+				console.log(result);
+				setCompanyArray(result.position_groups)
+				setItems(result.skills)
+				setAchivementArray(result.awards)
+				setData(result)
+			})
+			.catch(error => console.log('error', error));
+	}, [])
+
 	const { classes } = props;
+	const theme = useTheme();
 	return (
 		<>
-			<Grid container spacing={1}>
-				<Grid item xs={7}>
-					<Box sx={{ m: 5 }}>
-						<Paper className={classes.root}>
-							<Grid container spacing={16}>
-								<Grid item>
-									<ButtonBase className={classes.image}>
-										<img className={classes.img} alt="complex" src={img} />
-									</ButtonBase>
-								</Grid>
-								<Grid item xs={12} sm container>
-									<Grid item xs container direction="column" spacing={12}>
-										<Grid item md>
-											<Typography gutterBottom variant="h5">
-												Khushi-Mehta
-											</Typography>
-											<Typography>khushimehta795@gmail.com</Typography>
-										</Grid>
-									</Grid>
-								</Grid>
-							</Grid>
-						</Paper>
-					</Box>
+			<Grid container spacing={1} style={{ padding: '30px' }}>
+				<Grid item md={7} sx={{ display: 'flex', backgroundColor: 'white', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+					<Card sx={{ display: 'flex', padding: '15px' }}>
+						<CardMedia
+							component="img"
+							sx={{ width: 151 }}
+							image={data.profile_picture}
+							alt=""
+						/>
+						<Box sx={{ display: 'flex', flexDirection: 'column' }}>
+							<CardContent sx={{ flex: '1 0 auto' }}>
+								<h3 component="div" variant="h5" style={{ margin: '0', padding: '0' }}>
+									{data.first_name}
+								</h3>
+								<Typography variant="subtitle1" color="text.secondary" component="div">
+									{lclStorage.email}
+								</Typography>
+							</CardContent>
+
+						</Box>
+					</Card>
 				</Grid>
-				<Grid item xs={5}>
+				<Grid item xs={5} md={4}>
 					<Box sx={{ m: 5 }}>
 						<Paper className={classes.root}>
 							<Grid container spacing={16}>
@@ -92,9 +139,9 @@ function Profile(props) {
 									<Grid item xs container direction="column" spacing={12}>
 										<Grid item xs >
 											<Typography gutterBottom variant="heading">
-                                            khushi-mehta-290b80212
+												{data.profile_id}
 											</Typography>
-											<Typography>https://www.linkedin.com/in/khushi-mehta-290b80212/</Typography>
+											<Typography>{`https://www.linkedin.com/in/${lclStorage.linkedIn}}/`}</Typography>
 										</Grid>
 									</Grid>
 								</Grid>
@@ -118,7 +165,7 @@ function Profile(props) {
 									<Grid item xs container direction="column" spacing={12}>
 										<Grid item xs>
 											<Typography gutterBottom variant="heading">
-                                            khushi-mehta-290b80212
+												khushi-mehta-290b80212
 											</Typography>
 											<Typography>https://github.com/khushimehta24</Typography>
 										</Grid>
