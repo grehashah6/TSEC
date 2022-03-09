@@ -46,7 +46,7 @@ function Profile(props) {
 	const { classes } = props;
 	return (
 		<>
-			<Grid container spacing={1}>
+			<Grid container spacing={1} style={{ width:"100%"}}>
 				<Grid item xs={7}>
 					<Box sx={{ m: 5 }}>
 						<Paper className={classes.root}>

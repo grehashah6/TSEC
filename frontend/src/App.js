@@ -8,6 +8,7 @@ import SignUp from './Pages/SignUp';
 import Details from './Pages/Details';
 import Landing from './Pages/Landing';
 import Profile from './Pages/Profile';
+import ProjectForm from './Pages/ProjectForm';
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
           <Route exact path='/details' element={<Details />} />
           <Route exact path='/' element={<Landing />} />
           <Route exact path='/profile' element={<Profile />} />
+          <Route exact path='/projectform' element={<ProjectForm />} />
 
         </Routes>
       </Router>
