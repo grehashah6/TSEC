@@ -11,6 +11,7 @@ import Dashboard from './Pages/Dashboard';
 import CustomisedDetails from './Pages/CustomisedDetails';
 
 import Profile from './Pages/Profile';
+import ProjectForm from './Pages/ProjectForm';
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
           </Route>
           <Route exact path='/' element={<Landing />} />
           <Route exact path='/profile' element={<Profile />} />
+          <Route exact path='/projectform' element={<ProjectForm />} />
 
         </Routes>
       </Router>
