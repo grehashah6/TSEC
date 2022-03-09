@@ -5,6 +5,7 @@ import { useLocation } from 'react-router';
 import { useNavigate } from 'react-router';
 import Login from './Pages/Login';
 import SignUp from './Pages/SignUp';
+import Details from './Pages/Details';
 
 function App() {
   const PrivateRoute = () => {
@@ -24,8 +25,9 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route exact path='/' element={<Login />} />
+          <Route exact path='/login' element={<Login />} />
           <Route exact path='/signup' element={<SignUp />} />
+          <Route exact path='/' element={<Details />} />
         </Routes>
       </Router>
     </>
