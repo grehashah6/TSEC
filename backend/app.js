@@ -4,12 +4,12 @@ dotenv.config()
 import express from 'express'
 const app = express()
 
-import db from'./config/db.js'
-import morgan from'morgan'
-import userRouter from'./routes/user.js'
+import db from './config/db.js'
+import morgan from 'morgan'
+import userRouter from './routes/user.js'
+import activityRouter from './routes/activity.js'
 
 import cors from 'cors'
-
 
 const port = process.env.PORT || 3001
 
@@ -21,7 +21,10 @@ app.use(cors())
 app.use(express.json())
 
 app.use('/api/user', userRouter)
+app.use('/api/activity', activityRouter)
 
-const server = app.listen(port, () => console.log(`server has started on port ${port}`))
+const server = app.listen(port, () =>
+  console.log(`server has started on port ${port}`)
+)
 
 export default server
